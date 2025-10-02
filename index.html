@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Điểm danh học sinh</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
     <style>
@@ -14,184 +14,177 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
+            background: #667eea;
+            height: 100vh;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 500px;
         }
         
         .header {
-            text-align: center;
+            background: #667eea;
             color: white;
-            margin-bottom: 20px;
+            padding: 15px 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
         
         .header h1 {
-            font-size: 28px;
-            margin-bottom: 8px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            font-size: 22px;
+            font-weight: 600;
         }
         
-        .header p {
-            font-size: 16px;
-            opacity: 0.9;
-        }
-        
-        .scanner-box {
+        .scanner-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
             background: white;
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .camera-view {
+            height: 45vh;
+            background: #000;
+            position: relative;
+            overflow: hidden;
         }
         
         #reader {
-            border-radius: 15px;
-            overflow: hidden;
             width: 100%;
+            height: 100%;
         }
         
-        .status {
-            text-align: center;
-            padding: 15px;
+        #reader video {
+            object-fit: cover;
+        }
+        
+        .info-panel {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
             background: #f8f9fa;
-            border-radius: 10px;
-            margin-top: 15px;
+        }
+        
+        .student-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+        
+        .student-card.empty {
+            text-align: center;
+            color: #999;
+            padding: 30px 20px;
+        }
+        
+        .student-card h3 {
+            color: #667eea;
+            font-size: 16px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        
+        .info-row {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
             color: #666;
-            font-size: 15px;
+            font-size: 14px;
+            min-width: 100px;
             font-weight: 500;
+        }
+        
+        .info-value {
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+            flex: 1;
         }
         
         .btn {
             width: 100%;
             padding: 16px;
             border: none;
-            border-radius: 12px;
-            font-size: 18px;
+            border-radius: 10px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 15px;
+            transition: all 0.2s;
         }
         
-        .btn-primary {
-            background: white;
-            color: #667eea;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        .btn-submit {
+            background: #10b981;
+            color: white;
+            margin-bottom: 10px;
         }
         
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        .btn-submit:active {
+            background: #059669;
+            transform: scale(0.98);
         }
         
-        .btn-danger {
+        .btn-submit:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .btn-cancel {
             background: #ef4444;
             color: white;
         }
         
-        .btn-danger:hover {
+        .btn-cancel:active {
             background: #dc2626;
+            transform: scale(0.98);
         }
         
-        .result-box {
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            margin-top: 20px;
-            display: none;
-        }
-        
-        .result-box.show {
-            display: block;
-            animation: slideUp 0.3s ease;
-        }
-        
-        .result-box.submitting {
-            background: #fef3c7;
-            border-left: 4px solid #f59e0b;
-        }
-        
-        .result-box.success {
-            background: #f0fdf4;
-            border-left: 4px solid #10b981;
-        }
-        
-        .result-box.error {
-            background: #fee;
-            border-left: 4px solid #ef4444;
-        }
-        
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .result-box h3 {
-            margin-bottom: 15px;
-            font-size: 20px;
-        }
-        
-        .submitting h3 {
-            color: #f59e0b;
-        }
-        
-        .success h3 {
-            color: #10b981;
-        }
-        
-        .error h3 {
-            color: #ef4444;
-        }
-        
-        .student-info {
-            background: rgba(255,255,255,0.5);
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-        }
-        
-        .student-info p {
-            margin: 8px 0;
-            color: #333;
-            font-size: 16px;
-            line-height: 1.6;
-        }
-        
-        .student-info strong {
-            color: #667eea;
-            font-weight: 600;
-        }
-        
-        .auto-close-msg {
+        .status-bar {
+            padding: 12px 20px;
             text-align: center;
-            color: #666;
             font-size: 14px;
-            margin-top: 10px;
+            font-weight: 500;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .status-bar.scanning {
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+        
+        .status-bar.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-bar.error {
+            background: #fee;
+            color: #991b1b;
+        }
+        
+        .status-bar.submitting {
+            background: #fef3c7;
+            color: #92400e;
         }
         
         .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #f59e0b;
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(0,0,0,0.1);
+            border-top: 2px solid #92400e;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 15px auto;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
         }
         
         @keyframes spin {
@@ -199,41 +192,64 @@
             100% { transform: rotate(360deg); }
         }
         
-        .hidden {
-            display: none;
+        .start-screen {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
         
-        .error-msg {
-            background: #fee;
-            color: #c33;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 15px;
-            border-left: 4px solid #c33;
+        .start-btn {
+            background: white;
+            color: #667eea;
+            padding: 20px 40px;
+            font-size: 18px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .start-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>📱 Điểm danh học sinh</h1>
-            <p>Quét mã QR để ghi nhận</p>
-        </div>
-        
-        <button id="startBtn" class="btn btn-primary" onclick="startScanner()">
-            Bắt đầu quét mã
+    <div class="header">
+        <h1>📱 Điểm danh học sinh</h1>
+    </div>
+    
+    <div class="start-screen" id="startScreen">
+        <button class="btn start-btn" onclick="startScanner()">
+            Bắt đầu quét mã QR
         </button>
-        
-        <div class="scanner-box hidden" id="scannerBox">
+    </div>
+    
+    <div class="scanner-container hidden" id="scannerContainer">
+        <div class="camera-view">
             <div id="reader"></div>
-            <div class="status" id="status">Hướng camera vào mã QR...</div>
-            <button class="btn btn-danger" onclick="stopScanner()">Dừng camera</button>
         </div>
         
-        <div class="result-box" id="resultBox">
-            <h3 id="resultTitle">✅ Quét thành công!</h3>
-            <div class="student-info" id="studentInfo"></div>
-            <div id="submitStatus"></div>
+        <div class="info-panel">
+            <div class="student-card empty" id="studentCard">
+                <p>🔍 Hướng camera vào mã QR của học sinh</p>
+            </div>
+            
+            <button class="btn btn-submit hidden" id="submitBtn" onclick="submitAttendance()">
+                ✓ Xác nhận điểm danh
+            </button>
+            
+            <button class="btn btn-cancel" onclick="cancelScan()">
+                Dừng quét
+            </button>
+        </div>
+        
+        <div class="status-bar scanning" id="statusBar">
+            Sẵn sàng quét mã QR...
         </div>
     </div>
 
@@ -246,157 +262,160 @@
         let html5QrcodeScanner;
         let currentStudent = null;
         let scannerRunning = false;
+        let isSubmitting = false;
         
         function startScanner() {
-            document.getElementById('startBtn').classList.add('hidden');
-            document.getElementById('scannerBox').classList.remove('hidden');
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('scannerContainer').classList.remove('hidden');
             
             scannerRunning = true;
             
             html5QrcodeScanner = new Html5Qrcode("reader");
             
+            const config = {
+                fps: 10,
+                qrbox: { width: 250, height: 250 },
+                aspectRatio: 1.0
+            };
+            
             html5QrcodeScanner.start(
                 { facingMode: "environment" },
-                {
-                    fps: 10,
-                    qrbox: { width: 250, height: 250 }
-                },
+                config,
                 onScanSuccess,
                 onScanError
             ).catch(err => {
-                document.getElementById('status').innerHTML = 
-                    '<div class="error-msg">❌ Không thể truy cập camera. Vui lòng cấp quyền sử dụng camera.</div>';
+                updateStatus('error', '❌ Không thể truy cập camera. Vui lòng cấp quyền.');
                 console.error(err);
             });
         }
         
-        function stopScanner() {
+        function cancelScan() {
             scannerRunning = false;
             if (html5QrcodeScanner) {
                 html5QrcodeScanner.stop().then(() => {
-                    document.getElementById('startBtn').classList.remove('hidden');
-                    document.getElementById('scannerBox').classList.add('hidden');
-                    document.getElementById('resultBox').classList.remove('show');
+                    document.getElementById('startScreen').classList.remove('hidden');
+                    document.getElementById('scannerContainer').classList.add('hidden');
+                    resetStudentCard();
                 }).catch(err => console.error(err));
             }
         }
         
         function onScanSuccess(decodedText, decodedResult) {
-            if (!scannerRunning) return;
+            if (!scannerRunning || isSubmitting) return;
             
             try {
-                // Parse QR code data (JSON format)
-                currentStudent = JSON.parse(decodedText);
+                // Parse QR code data
+                const student = JSON.parse(decodedText);
                 
-                // Show result box immediately
-                const resultBox = document.getElementById('resultBox');
-                const resultTitle = document.getElementById('resultTitle');
-                const submitStatus = document.getElementById('submitStatus');
-                
-                resultBox.className = 'result-box show submitting';
-                resultTitle.textContent = '📤 Đang gửi...';
+                // Store current student
+                currentStudent = student;
                 
                 // Display student info
-                document.getElementById('studentInfo').innerHTML = `
-                    <p><strong>Mã học sinh:</strong> ${currentStudent.id}</p>
-                    <p><strong>Tên:</strong> ${currentStudent.name}</p>
-                `;
+                showStudentInfo(student);
                 
-                submitStatus.innerHTML = '<div class="spinner"></div><p class="auto-close-msg">Đang ghi nhận điểm danh...</p>';
-                
-                document.getElementById('status').innerHTML = 
-                    '<div style="color: #f59e0b; font-weight: 600;">⏳ Đang gửi dữ liệu...</div>';
-                
-                // Vibrate if supported
+                // Vibrate
                 if (navigator.vibrate) {
                     navigator.vibrate(100);
                 }
                 
-                // Submit to Google Form
-                submitToGoogleForm(currentStudent);
+                updateStatus('success', '✓ Đã quét mã QR thành công!');
                 
             } catch (e) {
-                document.getElementById('status').innerHTML = 
-                    '<div class="error-msg">❌ Mã QR không hợp lệ</div>';
+                updateStatus('error', '❌ Mã QR không hợp lệ');
                 console.error('Parse error:', e);
+                setTimeout(() => {
+                    updateStatus('scanning', 'Sẵn sàng quét mã QR...');
+                }, 2000);
             }
         }
         
-        async function submitToGoogleForm(student) {
+        function showStudentInfo(student) {
+            const card = document.getElementById('studentCard');
+            card.className = 'student-card';
+            card.innerHTML = `
+                <h3>Thông tin học sinh</h3>
+                <div class="info-row">
+                    <span class="info-label">Mã học sinh:</span>
+                    <span class="info-value">${student.id}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Tên:</span>
+                    <span class="info-value">${student.name}</span>
+                </div>
+            `;
+            
+            document.getElementById('submitBtn').classList.remove('hidden');
+        }
+        
+        function resetStudentCard() {
+            const card = document.getElementById('studentCard');
+            card.className = 'student-card empty';
+            card.innerHTML = '<p>🔍 Hướng camera vào mã QR của học sinh</p>';
+            
+            document.getElementById('submitBtn').classList.add('hidden');
+            currentStudent = null;
+            isSubmitting = false;
+        }
+        
+        async function submitAttendance() {
+            if (!currentStudent || isSubmitting) return;
+            
+            isSubmitting = true;
+            document.getElementById('submitBtn').disabled = true;
+            updateStatus('submitting', '<span class="spinner"></span>Đang gửi dữ liệu...');
+            
             // Build form data
             const formData = new FormData();
-            formData.append(STUDENT_ID_FIELD, student.id);
-            formData.append(STUDENT_NAME_FIELD, student.name);
+            formData.append(STUDENT_ID_FIELD, currentStudent.id);
+            formData.append(STUDENT_NAME_FIELD, currentStudent.name);
             
             try {
-                // Use no-cors mode since Google Forms doesn't allow CORS
-                const response = await fetch(FORM_URL, {
+                await fetch(FORM_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     body: formData
                 });
                 
-                // no-cors mode always returns opaque response, so we assume success
-                showSubmitSuccess();
+                // Success
+                updateStatus('success', '✅ Điểm danh thành công!');
+                
+                // Vibrate success pattern
+                if (navigator.vibrate) {
+                    navigator.vibrate([100, 50, 100]);
+                }
+                
+                // Reset after 1.5 seconds
+                setTimeout(() => {
+                    resetStudentCard();
+                    document.getElementById('submitBtn').disabled = false;
+                    updateStatus('scanning', 'Sẵn sàng quét mã QR...');
+                }, 1500);
                 
             } catch (error) {
                 console.error('Submit error:', error);
-                showSubmitError(error.message);
+                updateStatus('error', '❌ Gửi thất bại. Vui lòng thử lại.');
+                document.getElementById('submitBtn').disabled = false;
+                isSubmitting = false;
+                
+                // Vibrate error
+                if (navigator.vibrate) {
+                    navigator.vibrate([200, 100, 200]);
+                }
+                
+                setTimeout(() => {
+                    updateStatus('scanning', 'Sẵn sàng quét mã QR...');
+                }, 3000);
             }
         }
         
-        function showSubmitSuccess() {
-            const resultBox = document.getElementById('resultBox');
-            const resultTitle = document.getElementById('resultTitle');
-            const submitStatus = document.getElementById('submitStatus');
-            
-            resultBox.className = 'result-box show success';
-            resultTitle.textContent = '✅ Điểm danh thành công!';
-            submitStatus.innerHTML = '<p class="auto-close-msg">Sẵn sàng quét học sinh tiếp theo...</p>';
-            
-            document.getElementById('status').innerHTML = 
-                '<div style="color: #10b981; font-weight: 600;">✓ Đã ghi nhận!</div>';
-            
-            // Vibrate success pattern
-            if (navigator.vibrate) {
-                navigator.vibrate([100, 50, 100]);
-            }
-            
-            // Auto-hide result after 2 seconds and continue scanning
-            setTimeout(() => {
-                resultBox.classList.remove('show');
-                document.getElementById('status').innerHTML = 
-                    '<div style="color: #666;">Hướng camera vào mã QR...</div>';
-            }, 2000);
-        }
-        
-        function showSubmitError(errorMsg) {
-            const resultBox = document.getElementById('resultBox');
-            const resultTitle = document.getElementById('resultTitle');
-            const submitStatus = document.getElementById('submitStatus');
-            
-            resultBox.className = 'result-box show error';
-            resultTitle.textContent = '❌ Gửi thất bại';
-            submitStatus.innerHTML = `<p class="auto-close-msg">Lỗi: ${errorMsg}<br>Vui lòng thử lại.</p>`;
-            
-            document.getElementById('status').innerHTML = 
-                '<div class="error-msg">❌ Không thể gửi dữ liệu</div>';
-            
-            // Vibrate error pattern
-            if (navigator.vibrate) {
-                navigator.vibrate([200, 100, 200]);
-            }
-            
-            // Auto-hide after 4 seconds
-            setTimeout(() => {
-                resultBox.classList.remove('show');
-                document.getElementById('status').innerHTML = 
-                    '<div style="color: #666;">Hướng camera vào mã QR...</div>';
-            }, 4000);
+        function updateStatus(type, message) {
+            const statusBar = document.getElementById('statusBar');
+            statusBar.className = `status-bar ${type}`;
+            statusBar.innerHTML = message;
         }
         
         function onScanError(errorMessage) {
-            // Ignore scan errors (happens while searching for QR code)
+            // Ignore scan errors
         }
     </script>
 </body>
