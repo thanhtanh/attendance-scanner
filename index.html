@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Attendance Scanner</title>
+    <title>Điểm danh học sinh</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
     <style>
         * {
@@ -17,70 +17,39 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
         
         .container {
+            width: 100%;
             max-width: 500px;
-            margin: 0 auto;
         }
         
         .header {
-            background: white;
-            border-radius: 20px;
-            padding: 25px;
+            text-align: center;
+            color: white;
             margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
         
         .header h1 {
-            color: #667eea;
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-        
-        .config-section {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 15px;
-        }
-        
-        .config-section label {
-            display: block;
-            font-weight: 600;
-            color: #333;
+            font-size: 28px;
             margin-bottom: 8px;
-            font-size: 14px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         
-        .config-section input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-        
-        .config-section input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        .config-section small {
-            color: #666;
-            font-size: 12px;
-            display: block;
-            margin-top: -5px;
-            margin-bottom: 10px;
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
         }
         
         .scanner-box {
             background: white;
             border-radius: 20px;
             padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
         
         #reader {
@@ -89,59 +58,79 @@
             width: 100%;
         }
         
+        .status {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-top: 15px;
+            color: #666;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        
         .btn {
             width: 100%;
-            padding: 15px;
+            padding: 16px;
             border: none;
             border-radius: 12px;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            margin-top: 15px;
         }
         
         .btn-primary {
-            background: #667eea;
-            color: white;
+            background: white;
+            color: #667eea;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
         
         .btn-primary:hover {
-            background: #5568d3;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }
         
         .btn-danger {
             background: #ef4444;
             color: white;
-            margin-top: 10px;
         }
         
         .btn-danger:hover {
             background: #dc2626;
         }
         
-        .btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
         .result-box {
             background: white;
             border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             margin-top: 20px;
             display: none;
         }
         
         .result-box.show {
             display: block;
-            animation: slideIn 0.3s ease;
+            animation: slideUp 0.3s ease;
         }
         
-        @keyframes slideIn {
+        .result-box.submitting {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .result-box.success {
+            background: #f0fdf4;
+            border-left: 4px solid #10b981;
+        }
+        
+        .result-box.error {
+            background: #fee;
+            border-left: 4px solid #ef4444;
+        }
+        
+        @keyframes slideUp {
             from {
                 opacity: 0;
                 transform: translateY(20px);
@@ -153,40 +142,68 @@
         }
         
         .result-box h3 {
-            color: #10b981;
             margin-bottom: 15px;
             font-size: 20px;
         }
         
+        .submitting h3 {
+            color: #f59e0b;
+        }
+        
+        .success h3 {
+            color: #10b981;
+        }
+        
+        .error h3 {
+            color: #ef4444;
+        }
+        
         .student-info {
-            background: #f0fdf4;
+            background: rgba(255,255,255,0.5);
             padding: 15px;
             border-radius: 10px;
             margin: 15px 0;
-            border-left: 4px solid #10b981;
         }
         
         .student-info p {
             margin: 8px 0;
             color: #333;
             font-size: 16px;
+            line-height: 1.6;
         }
         
         .student-info strong {
-            color: #059669;
+            color: #667eea;
+            font-weight: 600;
         }
         
-        .status {
+        .auto-close-msg {
             text-align: center;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            margin-top: 15px;
             color: #666;
             font-size: 14px;
+            margin-top: 10px;
         }
         
-        .error {
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #f59e0b;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 15px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .error-msg {
             background: #fee;
             color: #c33;
             padding: 15px;
@@ -194,88 +211,47 @@
             margin-top: 15px;
             border-left: 4px solid #c33;
         }
-        
-        .hidden {
-            display: none;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>📱 Student Attendance</h1>
-            <p style="color: #666; margin-top: 5px;">Scan student QR codes</p>
-            
-            <div class="config-section">
-                <label for="formUrl">Google Form URL:</label>
-                <input 
-                    type="text" 
-                    id="formUrl" 
-                    placeholder="https://docs.google.com/forms/d/e/1FAIpQLSdMrS9KzlpqgrekqvJN6m3FAjSLIMt1Puaeq5dbtcnr3wFmcw/viewform"
-                    value="https://docs.google.com/forms/d/e/1FAIpQLSdMrS9KzlpqgrekqvJN6m3FAjSLIMt1Puaeq5dbtcnr3wFmcw/viewform"
-                >
-                <small>Paste your Google Form link here</small>
-                
-                <label for="studentIdField">Mã học sinh:</label>
-                <input 
-                    type="text" 
-                    id="studentIdField" 
-                    placeholder="entry.219808180"
-                    value="entry.219808180"
-                >
-
-                <label for="studentNameField">Tên học sinh:</label>
-                <input 
-                    type="text" 
-                    id="studentNameField" 
-                    placeholder="entry.290987831"
-                    value="entry.290987831"
-                >
-            </div>
-            
-            <button id="startBtn" class="btn btn-primary" onclick="startScanner()">
-                Start Camera
-            </button>
-            <button id="stopBtn" class="btn btn-danger hidden" onclick="stopScanner()">
-                Stop Camera
-            </button>
+            <h1>📱 Điểm danh học sinh</h1>
+            <p>Quét mã QR để ghi nhận</p>
         </div>
+        
+        <button id="startBtn" class="btn btn-primary" onclick="startScanner()">
+            Bắt đầu quét mã
+        </button>
         
         <div class="scanner-box hidden" id="scannerBox">
             <div id="reader"></div>
-            <div class="status" id="status">Point camera at QR code...</div>
+            <div class="status" id="status">Hướng camera vào mã QR...</div>
+            <button class="btn btn-danger" onclick="stopScanner()">Dừng camera</button>
         </div>
         
         <div class="result-box" id="resultBox">
-            <h3>✅ Scanned Successfully!</h3>
+            <h3 id="resultTitle">✅ Quét thành công!</h3>
             <div class="student-info" id="studentInfo"></div>
-            <button class="btn btn-primary" onclick="openForm()">Open Attendance Form</button>
-            <button class="btn btn-danger" onclick="clearResult()">Scan Another</button>
+            <div id="submitStatus"></div>
         </div>
     </div>
 
     <script>
+        // Pre-configured form settings
+        const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdMrS9KzlpqgrekqvJN6m3FAjSLIMt1Puaeq5dbtcnr3wFmcw/formResponse';
+        const STUDENT_ID_FIELD = 'entry.219808180';
+        const STUDENT_NAME_FIELD = 'entry.290987831';
+        
         let html5QrcodeScanner;
         let currentStudent = null;
+        let scannerRunning = false;
         
         function startScanner() {
-            const formUrl = document.getElementById('formUrl').value.trim();
-            const fieldId = document.getElementById('studentIdField').value.trim();
-            
-            if (!formUrl || formUrl === 'https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform') {
-                alert('Please enter your Google Form URL first!');
-                return;
-            }
-            
-            if (!fieldId || fieldId === 'entry.123456789') {
-                alert('Please enter your Student ID field entry!');
-                return;
-            }
-            
             document.getElementById('startBtn').classList.add('hidden');
-            document.getElementById('stopBtn').classList.remove('hidden');
             document.getElementById('scannerBox').classList.remove('hidden');
-            document.getElementById('resultBox').classList.remove('show');
+            
+            scannerRunning = true;
             
             html5QrcodeScanner = new Html5Qrcode("reader");
             
@@ -289,74 +265,138 @@
                 onScanError
             ).catch(err => {
                 document.getElementById('status').innerHTML = 
-                    '<div class="error">❌ Camera access denied. Please allow camera permission.</div>';
+                    '<div class="error-msg">❌ Không thể truy cập camera. Vui lòng cấp quyền sử dụng camera.</div>';
                 console.error(err);
             });
         }
         
         function stopScanner() {
+            scannerRunning = false;
             if (html5QrcodeScanner) {
                 html5QrcodeScanner.stop().then(() => {
                     document.getElementById('startBtn').classList.remove('hidden');
-                    document.getElementById('stopBtn').classList.add('hidden');
                     document.getElementById('scannerBox').classList.add('hidden');
+                    document.getElementById('resultBox').classList.remove('show');
                 }).catch(err => console.error(err));
             }
         }
         
         function onScanSuccess(decodedText, decodedResult) {
+            if (!scannerRunning) return;
+            
             try {
                 // Parse QR code data (JSON format)
                 currentStudent = JSON.parse(decodedText);
                 
+                // Show result box immediately
+                const resultBox = document.getElementById('resultBox');
+                const resultTitle = document.getElementById('resultTitle');
+                const submitStatus = document.getElementById('submitStatus');
+                
+                resultBox.className = 'result-box show submitting';
+                resultTitle.textContent = '📤 Đang gửi...';
+                
                 // Display student info
                 document.getElementById('studentInfo').innerHTML = `
-                    <p><strong>Student ID:</strong> ${currentStudent.id}</p>
-                    <p><strong>Name:</strong> ${currentStudent.name}</p>
+                    <p><strong>Mã học sinh:</strong> ${currentStudent.id}</p>
+                    <p><strong>Tên:</strong> ${currentStudent.name}</p>
                 `;
                 
-                document.getElementById('resultBox').classList.add('show');
-                document.getElementById('status').innerHTML = 
-                    '<div style="color: #10b981; font-weight: 600;">✓ QR Code scanned!</div>';
+                submitStatus.innerHTML = '<div class="spinner"></div><p class="auto-close-msg">Đang ghi nhận điểm danh...</p>';
                 
-                // Stop scanner
-                stopScanner();
+                document.getElementById('status').innerHTML = 
+                    '<div style="color: #f59e0b; font-weight: 600;">⏳ Đang gửi dữ liệu...</div>';
                 
                 // Vibrate if supported
                 if (navigator.vibrate) {
-                    navigator.vibrate(200);
+                    navigator.vibrate(100);
                 }
+                
+                // Submit to Google Form
+                submitToGoogleForm(currentStudent);
                 
             } catch (e) {
                 document.getElementById('status').innerHTML = 
-                    '<div class="error">❌ Invalid QR code format</div>';
+                    '<div class="error-msg">❌ Mã QR không hợp lệ</div>';
                 console.error('Parse error:', e);
             }
         }
         
+        async function submitToGoogleForm(student) {
+            // Build form data
+            const formData = new FormData();
+            formData.append(STUDENT_ID_FIELD, student.id);
+            formData.append(STUDENT_NAME_FIELD, student.name);
+            
+            try {
+                // Use no-cors mode since Google Forms doesn't allow CORS
+                const response = await fetch(FORM_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: formData
+                });
+                
+                // no-cors mode always returns opaque response, so we assume success
+                showSubmitSuccess();
+                
+            } catch (error) {
+                console.error('Submit error:', error);
+                showSubmitError(error.message);
+            }
+        }
+        
+        function showSubmitSuccess() {
+            const resultBox = document.getElementById('resultBox');
+            const resultTitle = document.getElementById('resultTitle');
+            const submitStatus = document.getElementById('submitStatus');
+            
+            resultBox.className = 'result-box show success';
+            resultTitle.textContent = '✅ Điểm danh thành công!';
+            submitStatus.innerHTML = '<p class="auto-close-msg">Sẵn sàng quét học sinh tiếp theo...</p>';
+            
+            document.getElementById('status').innerHTML = 
+                '<div style="color: #10b981; font-weight: 600;">✓ Đã ghi nhận!</div>';
+            
+            // Vibrate success pattern
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 50, 100]);
+            }
+            
+            // Auto-hide result after 2 seconds and continue scanning
+            setTimeout(() => {
+                resultBox.classList.remove('show');
+                document.getElementById('status').innerHTML = 
+                    '<div style="color: #666;">Hướng camera vào mã QR...</div>';
+            }, 2000);
+        }
+        
+        function showSubmitError(errorMsg) {
+            const resultBox = document.getElementById('resultBox');
+            const resultTitle = document.getElementById('resultTitle');
+            const submitStatus = document.getElementById('submitStatus');
+            
+            resultBox.className = 'result-box show error';
+            resultTitle.textContent = '❌ Gửi thất bại';
+            submitStatus.innerHTML = `<p class="auto-close-msg">Lỗi: ${errorMsg}<br>Vui lòng thử lại.</p>`;
+            
+            document.getElementById('status').innerHTML = 
+                '<div class="error-msg">❌ Không thể gửi dữ liệu</div>';
+            
+            // Vibrate error pattern
+            if (navigator.vibrate) {
+                navigator.vibrate([200, 100, 200]);
+            }
+            
+            // Auto-hide after 4 seconds
+            setTimeout(() => {
+                resultBox.classList.remove('show');
+                document.getElementById('status').innerHTML = 
+                    '<div style="color: #666;">Hướng camera vào mã QR...</div>';
+            }, 4000);
+        }
+        
         function onScanError(errorMessage) {
             // Ignore scan errors (happens while searching for QR code)
-        }
-        
-        function openForm() {
-            if (!currentStudent) return;
-            
-            const formUrl = document.getElementById('formUrl').value.trim();
-            const fieldId = document.getElementById('studentIdField').value.trim();
-            const nameFieldId = document.getElementById('studentNameField').value.trim();
-            
-            // Build Google Form URL with pre-filled student ID
-            const url = `${formUrl}?${fieldId}=${encodeURIComponent(currentStudent.id)}&${nameFieldId}=${encodeURIComponent(currentStudent.name)}`;
-
-            // Open in new tab
-            window.open(url, '_blank');
-        }
-        
-        function clearResult() {
-            currentStudent = null;
-            document.getElementById('resultBox').classList.remove('show');
-            document.getElementById('status').textContent = 'Point camera at QR code...';
-            startScanner();
         }
     </script>
 </body>
